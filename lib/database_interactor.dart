@@ -30,6 +30,7 @@ class DatabaseInteractor {
 
     String table = query.getTable();
     String selectStatement = query.getSelect().join(", ");
+    String distinctStatement = query.isDistinct() ? "DISTINCT " : "";
     String whereStatement = ' ';
     String orderByStatement = ' ';
 
@@ -51,7 +52,7 @@ class DatabaseInteractor {
       orderByStatement += orderBy + ' ' + (query.isOrderAsc() ? 'ASC' : 'DESC');
     }
 
-    String finalStatement = 'SELECT ' + selectStatement + ' FROM ' + table + whereStatement + orderByStatement;
+    String finalStatement = 'SELECT ' + distinctStatement + selectStatement + ' FROM ' + table + whereStatement + orderByStatement;
     print(finalStatement);
     Results result = await conn.query(finalStatement, whereValues);
 

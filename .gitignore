@@ -16,3 +16,4 @@ query_builder.iml
 pubspec.lock
 ios/
 android/
+QueryBuilder.iml

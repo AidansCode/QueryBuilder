@@ -4,7 +4,7 @@ import 'package:query_builder/database_interactor.dart';
 class Query {
 
   String _table, _orderBy;
-  List<String> _select, _where, _whereComparisons;
+  List<String> _select, _where, _whereComparisons, _groupBy;
   List<dynamic> _whereValues;
   List<Map<String, dynamic>> _insert;
   Map<String, dynamic> _update;
@@ -17,6 +17,7 @@ class Query {
     _select = [];
     _where = [];
     _whereComparisons = [];
+    _groupBy = [];
     _whereValues = [];
     _insert = [];
     _update = {};
@@ -30,6 +31,7 @@ class Query {
   List<String> getSelect() => _select;
   List<String> getWhere() => _where;
   List<String> getWhereComparisons() => _whereComparisons;
+  List<String> getGroupBy() => _groupBy;
   List<dynamic> getWhereValues() => _whereValues;
   List<Map<String, dynamic>> getInsert() => _insert;
   Map<String, dynamic> getUpdate() => _update;
@@ -100,6 +102,18 @@ class Query {
 
   Query distinct() {
     _isDistinct = true;
+
+    return this;
+  }
+
+  Query groupBy(List<String> groupBy) {
+    _groupBy.addAll(groupBy);
+
+    return this;
+  }
+
+  Query groupByOne(String groupBy) {
+    _groupBy.add(groupBy);
 
     return this;
   }

@@ -31,15 +31,16 @@ class DatabaseInteractor {
     String table = query.getTable();
     String selectStatement = query.getSelect().join(", ");
     String distinctStatement = query.isDistinct() ? "DISTINCT " : "";
-    String whereStatement = ' ';
-    String orderByStatement = ' ';
+    String whereStatement = '';
+    String groupByStatement = '';
+    String orderByStatement = '';
 
     List<String> where = query.getWhere(),
       whereComparisons = query.getWhereComparisons();
     List<dynamic> whereValues = query.getWhereValues();
 
     if (where.length > 0) {
-      whereStatement += 'WHERE ';
+      whereStatement = ' WHERE ';
       for(int i = 0; i < where.length; i++) {
         whereStatement += where[i] + ' ' + whereComparisons[i] + ' ?';
         if (i+1 < where.length)
@@ -49,10 +50,18 @@ class DatabaseInteractor {
 
     String orderBy = query.getOrderBy();
     if (query.getOrderBy() != '') {
-      orderByStatement += orderBy + ' ' + (query.isOrderAsc() ? 'ASC' : 'DESC');
+      orderByStatement = ' ORDER BY ' + orderBy + ' ' + (query.isOrderAsc() ? 'ASC' : 'DESC');
     }
 
-    String finalStatement = 'SELECT ' + distinctStatement + selectStatement + ' FROM ' + table + whereStatement + orderByStatement;
+    List<String> groupBy = query.getGroupBy();
+    if (groupBy.length > 0)
+      groupByStatement += ' GROUP BY ';
+    groupBy.forEach((String str) {
+      groupByStatement += str + ', ';
+    });
+    groupByStatement = groupByStatement.substring(0, groupByStatement.length - 2);
+
+    String finalStatement = 'SELECT ' + distinctStatement + selectStatement + ' FROM ' + table + whereStatement + groupByStatement + orderByStatement;
     print(finalStatement);
     Results result = await conn.query(finalStatement, whereValues);
 

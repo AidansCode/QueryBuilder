@@ -1,6 +1,6 @@
 name: query_builder
 description: Dart package to simplify database interaction
-version: 0.1.1
+version: 0.1.2
 author: Aidan Murphey
 homepage: aidanmurphey.com
 
@@ -8,12 +8,4 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
   mysql1: ^0.17.0
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-
-flutter:

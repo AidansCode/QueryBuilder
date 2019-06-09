@@ -28,6 +28,8 @@ class DatabaseInteractor {
   static Future<Results> select(Query query) async {
     MySqlConnection conn = await _getConnection();
 
+    List<dynamic> data = [];
+
     String table = query.getTable();
     String selectStatement = query.getSelect().join(", ");
     String distinctStatement = query.isDistinct() ? "DISTINCT " : "";
@@ -35,14 +37,21 @@ class DatabaseInteractor {
     String groupByStatement = '';
     String orderByStatement = '';
 
-    List<String> where = query.getWhere(),
-      whereComparisons = query.getWhereComparisons();
-    List<dynamic> whereValues = query.getWhereValues();
+    List<List<dynamic>> where = query.getWhere();
 
     if (where.length > 0) {
       whereStatement = ' WHERE ';
       for(int i = 0; i < where.length; i++) {
-        whereStatement += where[i] + ' ' + whereComparisons[i] + ' ?';
+        var oneWhere = where[i];
+        whereStatement += oneWhere[0].toString() + ' ';
+        if (oneWhere.length == 2) {
+          whereStatement += '= ?';
+          data.add(oneWhere[1]);
+        } else {
+          whereStatement += oneWhere[1].toString() + ' ?';
+          data.add(oneWhere[2]);
+        }
+
         if (i+1 < where.length)
           whereStatement += ' AND ';
       }
@@ -59,11 +68,12 @@ class DatabaseInteractor {
     groupBy.forEach((String str) {
       groupByStatement += str + ', ';
     });
-    groupByStatement = groupByStatement.substring(0, groupByStatement.length - 2);
+    if (groupBy.length > 0)
+      groupByStatement = groupByStatement.substring(0, groupByStatement.length - 2);
 
     String finalStatement = 'SELECT ' + distinctStatement + selectStatement + ' FROM ' + table + whereStatement + groupByStatement + orderByStatement;
     print(finalStatement);
-    Results result = await conn.query(finalStatement, whereValues);
+    Results result = await conn.query(finalStatement, data);
 
     conn.close();
 
@@ -128,19 +138,25 @@ class DatabaseInteractor {
     });
     setStatement = setStatement.substring(0, setStatement.length - 2);
 
-    List<String> where = query.getWhere(),
-        whereComparisons = query.getWhereComparisons();
-    List<dynamic> whereValues = query.getWhereValues();
+    List<List<dynamic>> where = query.getWhere();
 
     if (where.length > 0) {
-      whereStatement += 'WHERE ';
+      whereStatement = ' WHERE ';
       for(int i = 0; i < where.length; i++) {
-        whereStatement += where[i] + ' ' + whereComparisons[i] + ' ?';
+        var oneWhere = where[i];
+        whereStatement += oneWhere[0] + ' ';
+        if (oneWhere.length == 2) {
+          whereStatement += '= ?';
+          data.add(oneWhere[1]);
+        } else {
+          whereStatement += oneWhere[1] + ' ?';
+          data.add(oneWhere[2]);
+        }
+
         if (i+1 < where.length)
           whereStatement += ' AND ';
       }
     }
-    data.addAll(whereValues);
 
     String finalStatement = 'UPDATE ' + table + ' SET ' + setStatement + whereStatement;
     Results results = await conn.query(finalStatement, data);
@@ -153,23 +169,31 @@ class DatabaseInteractor {
     MySqlConnection conn = await _getConnection();
 
     String table = query.getTable();
+    List<dynamic> data = [];
 
     String whereStatement = ' ';
-    List<String> where = query.getWhere(),
-        whereComparisons = query.getWhereComparisons();
-    List<dynamic> whereValues = query.getWhereValues();
+    List<List<dynamic>> where = query.getWhere();
 
     if (where.length > 0) {
-      whereStatement += 'WHERE ';
+      whereStatement = ' WHERE ';
       for(int i = 0; i < where.length; i++) {
-        whereStatement += where[i] + ' ' + whereComparisons[i] + ' ?';
+        var oneWhere = where[i];
+        whereStatement += oneWhere[0] + ' ';
+        if (oneWhere.length == 2) {
+          whereStatement += '= ?';
+          data.add(oneWhere[1]);
+        } else {
+          whereStatement += oneWhere[1] + ' ?';
+          data.add(oneWhere[2]);
+        }
+
         if (i+1 < where.length)
           whereStatement += ' AND ';
       }
     }
 
     String finalStatement = 'DELETE FROM ' + table + whereStatement;
-    Results result = await conn.query(finalStatement, whereValues);
+    Results result = await conn.query(finalStatement, data);
 
     conn.close();
 

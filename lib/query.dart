@@ -4,8 +4,8 @@ import 'package:query_builder/database_interactor.dart';
 class Query {
 
   String _table, _orderBy;
-  List<String> _select, _where, _whereComparisons, _groupBy;
-  List<dynamic> _whereValues;
+  List<String> _select, _groupBy;
+  List<List<dynamic>> _where;
   List<Map<String, dynamic>> _insert;
   Map<String, dynamic> _update;
   bool _orderAsc, _isDistinct;
@@ -16,9 +16,7 @@ class Query {
 
     _select = [];
     _where = [];
-    _whereComparisons = [];
     _groupBy = [];
-    _whereValues = [];
     _insert = [];
     _update = {};
 
@@ -29,10 +27,8 @@ class Query {
   String getTable() => _table;
   String getOrderBy() => _orderBy;
   List<String> getSelect() => _select;
-  List<String> getWhere() => _where;
-  List<String> getWhereComparisons() => _whereComparisons;
+  List<List<dynamic>> getWhere() => _where;
   List<String> getGroupBy() => _groupBy;
-  List<dynamic> getWhereValues() => _whereValues;
   List<Map<String, dynamic>> getInsert() => _insert;
   Map<String, dynamic> getUpdate() => _update;
   bool isOrderAsc() => _orderAsc;
@@ -58,16 +54,8 @@ class Query {
     where.forEach((List<dynamic> l) {
       if (l.length == 1)
         throw ArgumentError('Each where statement must contain at least two items! (column, value) or (column, comparison, value)');
-      else if (l.length == 2) {
-        _where.add(l[0]);
-        _whereComparisons.add('=');
-        _whereValues.add(l[1]);
-      } else { //Assume 3, ignore extras
-        _where.add(l[0]);
-        _whereComparisons.add(l[1]);
-        _whereValues.add(l[2]);
-      }
     });
+    _where.addAll(where);
 
     return this;
   }
@@ -75,15 +63,8 @@ class Query {
   Query whereOne(List<dynamic> where) {
     if (where.length == 1)
       throw ArgumentError('Each where list must contain at least two items! [column, value] or [column, comparison, value]');
-    else if (where.length == 2) {
-      _where.add(where[0]);
-      _whereComparisons.add('=');
-      _whereValues.add(where[1]);
-    } else { //Assume 3, ignore extras
-      _where.add(where[0]);
-      _whereComparisons.add(where[1]);
-      _whereValues.add(where[2]);
-    }
+
+    _where.add(where);
 
     return this;
   }

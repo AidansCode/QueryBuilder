@@ -72,7 +72,6 @@ class DatabaseInteractor {
       groupByStatement = groupByStatement.substring(0, groupByStatement.length - 2);
 
     String finalStatement = 'SELECT ' + distinctStatement + selectStatement + ' FROM ' + table + whereStatement + groupByStatement + orderByStatement;
-    print(finalStatement);
     Results result = await conn.query(finalStatement, data);
 
     conn.close();
